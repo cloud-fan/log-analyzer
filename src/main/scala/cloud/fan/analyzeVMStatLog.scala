@@ -7,9 +7,10 @@ object analyzeVMStatLog extends LogAnalyzer {
 
   val group: String = "memory"
   val charts: Array[Chart] = Array(Chart("DRAMallocation", "system DRAM allocation", "size (mb)"))
+  val command: String = "vmstat -n 10 -S M"
 
   def apply(nodeType: String, node: String, logDir: String) {
-    val logIterator = analyzeLog.getLogContentIterator("vmstat -n 10 -S M", node, logDir)
+    val logIterator = analyzeLog.getLogContentIterator(command, node, logDir)
     charts.head.series = Array("swaped", "free", "buff", "cache")
     analyzeLog.initCharts(nodeType, node, group, charts)
     logIterator.next()

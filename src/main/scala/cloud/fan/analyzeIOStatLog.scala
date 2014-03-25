@@ -13,9 +13,10 @@ object analyzeIOStatLog extends LogAnalyzer {
     Chart("writeBandwidth", "Flash Write Bandwidth", throughput),
     Chart("readBandwidth", "Flash Read Bandwidth", throughput)
   )
+  val command: String = "iostat -xk 10"
 
   def apply(nodeType: String, node: String, logDir: String) {
-    val logIterator = analyzeLog.getLogContentIterator("iostat -xk 10", node, logDir)
+    val logIterator = analyzeLog.getLogContentIterator(command, node, logDir)
     val block = ArrayBuffer.empty[Array[String]]
     getBlock(logIterator, block)
     charts.foreach(_.series = block.map(_.head).toArray)
@@ -33,10 +34,15 @@ object analyzeIOStatLog extends LogAnalyzer {
     i.find(_.startsWith("Device:"))
     var line = i.next()
     while (line != "") {
-      if (!line.trim.startsWith("dm-")) {
-        block += line.trim.split("\\s+")
+      val data = line.trim.split("\\s+")
+      if (checkValidDevice(data.head)) {
+        block += data
       }
       line = i.next()
     }
+  }
+
+  def checkValidDevice(name: String) = {
+    name.matches("s[a-z]{2}") || name.startsWith("md")
   }
 }

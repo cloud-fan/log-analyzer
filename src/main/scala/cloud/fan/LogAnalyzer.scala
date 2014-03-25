@@ -7,6 +7,7 @@ trait LogAnalyzer {
 
   val group: String
   val charts: Array[Chart]
+  val command: String
 
   def apply(nodeType: String, node: String, logDir: String): Unit
 
