@@ -1,6 +1,7 @@
 package cloud.fan
 
 import scala.collection.mutable.ArrayBuffer
+import scala.sys.process._
 
 /**
  * Created by cloud on 3/24/14.
@@ -11,12 +12,12 @@ object analyzeMPStatLog extends LogAnalyzer {
   val charts: Array[Chart] = Array(Chart("allCPU", "CPU usage across cores", percentage))
 
   def apply(nodeType: String, node: String, logDir: String) {
+    val cpuCount = Seq("ssh", node, "grep processor /proc/cpuinfo|wc -l").!!.trim.toInt
     val logIterator = analyzeLog.getLogContentIterator("mpstat -P ALL 10", node, logDir)
-    val pattern = """(\d+)\sCPU""".r
-    val cpuCount = pattern.findFirstMatchIn(logIterator.next()).get.group(1).toInt
     charts.head.series = (0 until cpuCount).map("cpu" + _).toArray
     analyzeLog.initCharts(nodeType, node, group, charts)
     val block = ArrayBuffer.empty[String]
+    logIterator.next()
     getBlock(logIterator, block, cpuCount)
     while (true) {
       ChartSender.sendData(nodeType, node, group, charts.head.name, block.toArray)
