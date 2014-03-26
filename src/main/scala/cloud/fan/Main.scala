@@ -21,7 +21,7 @@ object Main {
   def doWork(nodes: Array[String], groups: Array[String], nodeType: String, logDir: String) {
     ChartSender.sendNodes(nodeType, nodes)
     for(node <- nodes) {
-      ChartSender.sendGroups(nodeType, node, groups.map(_.split(":").head))
+      ChartSender.sendGroups(nodeType, node, groups.map("(^[a-zA-Z]+).*".r.findFirstMatchIn(_).get.group(1)))
       for (group <- groups) {
         futures += future {
           analyzeLog(nodeType, node, logDir, group)
