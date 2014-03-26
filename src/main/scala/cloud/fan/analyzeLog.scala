@@ -8,12 +8,13 @@ import java.nio.charset.Charset
  */
 object analyzeLog {
 
-  def apply(nodeType: String, node: String, baseLogDir: String, group: String) {
+  def apply(nodeType: String, node: String, logDir: String, group: String) {
     group match {
-      case analyzeIFStatLog.group => analyzeIFStatLog(nodeType, node, baseLogDir)
-      case analyzeIOStatLog.group => analyzeIOStatLog(nodeType, node, baseLogDir)
-      case analyzeMPStatLog.group => analyzeMPStatLog(nodeType, node, baseLogDir)
-      case analyzeVMStatLog.group => analyzeVMStatLog(nodeType, node, baseLogDir)
+      case analyzeIFStatLog.group => analyzeIFStatLog(nodeType, node, logDir)
+      case analyzeIOStatLog.group => analyzeIOStatLog(nodeType, node, logDir)
+      case analyzeMPStatLog.group => analyzeMPStatLog(nodeType, node, logDir)
+      case analyzeVMStatLog.group => analyzeVMStatLog(nodeType, node, logDir)
+      case analyzeTopLog.pattern(process) => analyzeTopLog(nodeType, node, logDir, process)
     }
   }
 
@@ -39,4 +40,9 @@ object analyzeLog {
 
 case class Chart(name: String, title: String, yAxisTitle: String) {
   private[fan] var series: Array[String] = _
+
+  def this(name: String, title: String, yAxisTitle: String, series: Array[String]) {
+    this(name, title, yAxisTitle)
+    this.series = series
+  }
 }
