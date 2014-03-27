@@ -9,14 +9,14 @@ import scala.sys.process._
 object analyzeMPStatLog extends LogAnalyzer {
 
   val group: String = "CPU"
-  val charts: Array[Chart] = Array(Chart("allCPU", "CPU usage across cores", percentage))
+  charts += Chart("allCPU", "CPU usage across cores", percentage)
   val command: String = "mpstat -P ALL 10"
 
   def apply(nodeType: String, node: String, logDir: String) {
     val cpuCount = Seq("ssh", node, "grep processor /proc/cpuinfo|wc -l").!!.trim.toInt
     val logIterator = analyzeLog.getLogContentIterator(command, node, logDir)
     charts.head.series = (0 until cpuCount).map("cpu" + _).toArray
-    analyzeLog.initCharts(nodeType, node, group, charts)
+    analyzeLog.initCharts(nodeType, node, group, charts.toArray)
     val block = ArrayBuffer.empty[String]
     logIterator.next()
     getBlock(logIterator, block, cpuCount)

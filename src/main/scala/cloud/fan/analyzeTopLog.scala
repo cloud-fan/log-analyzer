@@ -8,14 +8,13 @@ import scala.sys.process._
 object analyzeTopLog extends LogAnalyzer {
 
   val group: String = "top"
-  val charts: Array[Chart] = Array(null)
   val command: String = "top -b -d 10 -p"
 
   def apply(nodeType: String, node: String, logDir: String, process: String) {
     val pid = Seq("ssh", node, "ps aux|grep "+process+"|grep -v grep|tail -n 1|awk '{print $2}'").!!.trim
     if (pid.matches("\\d+")) {
-      charts(0) = new Chart("top", s"CPU and Memory utilization of $process", percentage, Array("cpu", "memory"))
-      analyzeLog.initCharts(nodeType, node, group, charts)
+      charts += new Chart("top", s"CPU and Memory utilization of $process", percentage, Array("cpu", "memory"))
+      analyzeLog.initCharts(nodeType, node, group, charts.toArray)
       val logIterator = analyzeLog.getLogContentIterator(command + pid, node, logDir)
       logIterator.filter(_.matches("\\d+.+")).foreach {line =>
         val data = line.trim.split("\\s+")

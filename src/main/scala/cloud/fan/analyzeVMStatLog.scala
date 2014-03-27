@@ -6,14 +6,12 @@ package cloud.fan
 object analyzeVMStatLog extends LogAnalyzer {
 
   val group: String = "memory"
-  val charts: Array[Chart] = Array(
-    new Chart("DRAMallocation", "system DRAM allocation", "size (mb)", Array("swaped", "free", "buff", "cache"))
-  )
+  charts += new Chart("DRAMallocation", "system DRAM allocation", "size (mb)", Array("swaped", "free", "buff", "cache"))
   val command: String = "vmstat -n 10 -S M"
 
   def apply(nodeType: String, node: String, logDir: String) {
     val logIterator = analyzeLog.getLogContentIterator(command, node, logDir)
-    analyzeLog.initCharts(nodeType, node, group, charts)
+    analyzeLog.initCharts(nodeType, node, group, charts.toArray)
     logIterator.next()
     logIterator.next()
     logIterator.foreach{line =>

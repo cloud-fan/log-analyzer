@@ -6,7 +6,7 @@ package cloud.fan
 object analyzeIFStatLog extends LogAnalyzer {
 
   val group = "network"
-  val charts = Array(Chart("network", "Network Bandwidth", throughput))
+  charts += Chart("network", "Network Bandwidth", throughput)
   val command: String = "ifstat -n -T 10"
 
   def apply(nodeType: String, node: String, logDir: String) {
@@ -16,7 +16,7 @@ object analyzeIFStatLog extends LogAnalyzer {
       flatMap(s => Array((s._1 + "_in", s._2 * 2), (s._1 + "_out", s._2 * 2 + 1)))
     charts.head.series = series.map(_._1)
     val validDataIndex = series.map(_._2)
-    analyzeLog.initCharts(nodeType, node, group, charts)
+    analyzeLog.initCharts(nodeType, node, group, charts.toArray)
     logIterator.next()
     logIterator.foreach{line =>
       val allData = line.trim.split("\\s+")

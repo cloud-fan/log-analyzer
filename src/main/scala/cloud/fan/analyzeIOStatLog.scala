@@ -8,11 +8,9 @@ import scala.collection.mutable.ArrayBuffer
 object analyzeIOStatLog extends LogAnalyzer {
 
   val group = "disk"
-  val charts = Array(
-    Chart("flashUtilization", "Flash Utilization", percentage),
-    Chart("writeBandwidth", "Flash Write Bandwidth", throughput),
-    Chart("readBandwidth", "Flash Read Bandwidth", throughput)
-  )
+  charts += Chart("flashUtilization", "Flash Utilization", percentage)
+  charts += Chart("writeBandwidth", "Flash Write Bandwidth", throughput)
+  charts += Chart("readBandwidth", "Flash Read Bandwidth", throughput)
   val command: String = "iostat -xk 10"
 
   def apply(nodeType: String, node: String, logDir: String) {
@@ -20,7 +18,7 @@ object analyzeIOStatLog extends LogAnalyzer {
     val block = ArrayBuffer.empty[Array[String]]
     getBlock(logIterator, block)
     charts.foreach(_.series = block.map(_.head).toArray)
-    analyzeLog.initCharts(nodeType, node, group, charts)
+    analyzeLog.initCharts(nodeType, node, group, charts.toArray)
     while (true) {
       ChartSender.sendData(nodeType, node, group, charts(0).name, block.map(_.last).toArray)
       ChartSender.sendData(nodeType, node, group, charts(1).name, block.map(_(6)).toArray)
