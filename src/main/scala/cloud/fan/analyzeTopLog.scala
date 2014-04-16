@@ -10,7 +10,7 @@ object analyzeTopLog extends LogAnalyzer {
   val group: String = "top"
   val command: String = "top -b -d 10 -p "
 
-  def apply(nodeType: String, node: String, logDir: String, process: String) {
+  def apply(nodeType: String, node: String, logDir: String, process: String, reTryCount: Int = 20) {
     val pid = Seq("ssh", node, "ps aux|grep "+process+"|grep -v grep|tail -n 1|awk '{print $2}'").!!.trim
     if (pid.matches("\\d+")) {
       charts += new Chart("cpu", s"CPU utilization of $process", percentage, Array("cpu"))
@@ -23,7 +23,12 @@ object analyzeTopLog extends LogAnalyzer {
         ChartSender.sendData(nodeType, node, group, charts.last.name, Array(data(9)))
       }
     } else {
-      System.err.println(s"process $process can not found at remote server $node!")
+      if (reTryCount > 0) {
+        Thread.sleep(10000)
+        apply(nodeType, node, logDir, process, reTryCount - 1)
+      } else {
+        System.err.println(s"process $process can not found at remote server $node!")
+      }
     }
   }
 
