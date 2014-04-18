@@ -18,11 +18,10 @@ object analyzeLog {
     }
   }
 
-  def getLogContentIterator(command: String, node: String, logDir: String) = {
-    val path = Paths.get(logDir, s"${ChartSender.parseNodeName(node)}-${command.split("\\s+").head}.log")
-    import scala.sys.process._
+  def getLogContentIterator(command: Seq[String], node: String, logDir: String) = {
+    val path = Paths.get(logDir, s"${ChartSender.parseNodeName(node)}-${command.head}.log")
     val writer = Files.newBufferedWriter(path, Charset.forName("utf-8"))
-    Seq("ssh", node, command).lines.iterator.map {s =>
+    ShUtil.generateCommand(command, node).lines.iterator.map {s =>
       writer.write(s)
       writer.newLine()
       writer.flush()

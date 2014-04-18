@@ -11,7 +11,7 @@ object analyzeIOStatLog extends LogAnalyzer {
   charts += Chart("flashUtilization", "Flash Utilization", percentage)
   charts += Chart("writeBandwidth", "Flash Write Bandwidth", throughput)
   charts += Chart("readBandwidth", "Flash Read Bandwidth", throughput)
-  val command: String = "iostat -xk 10"
+  val command = Seq("iostat", "-xk", "10")
 
   def apply(nodeType: String, node: String, logDir: String) {
     val logIterator = analyzeLog.getLogContentIterator(command, node, logDir)

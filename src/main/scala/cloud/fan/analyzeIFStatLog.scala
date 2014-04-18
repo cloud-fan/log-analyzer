@@ -7,7 +7,7 @@ object analyzeIFStatLog extends LogAnalyzer {
 
   val group = "network"
   charts += Chart("network", "Network Bandwidth", throughput)
-  val command: String = "ifstat -n -T 10"
+  val command = Seq("ifstat", "-n", "-T", "10")
 
   def apply(nodeType: String, node: String, logDir: String) {
     val logIterator = analyzeLog.getLogContentIterator(command, node, logDir)

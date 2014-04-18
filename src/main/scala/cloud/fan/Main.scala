@@ -32,8 +32,11 @@ object Main {
 
   def cleanRemoteProcesses(nodes: Array[String], groups: Array[String]) {
     def kill(node: String, process: String) {
-      import scala.sys.process._
-      Seq("ssh", node, "ps aux|grep "+process+"|grep -v grep|awk '{print $2}'|xargs kill -9 > /dev/null 2>&1").!
+      val command = Seq(Seq("ps", "aux"), Seq("grep", process), Seq("grep", "-v", "grep"), Seq("grep", "-v", "log-analyzer"), Seq("awk", "{print $2}"))
+      val pid = ShUtil.generatePipedCommand(command, node).!!
+      if (pid.length > 0) {
+        ShUtil.generateCommand(Seq("kill", "-9") ++ pid.split("\n"), node).!
+      }
     }
     groups.foreach {
       case analyzeIFStatLog.group => nodes.foreach(kill(_, "ifstat"))

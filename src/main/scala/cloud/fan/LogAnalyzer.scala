@@ -9,7 +9,7 @@ trait LogAnalyzer {
 
   val group: String
   val charts = ArrayBuffer.empty[Chart]
-  val command: String
+  val command: Seq[String]
 
   val percentage = "percentage (%)"
   val throughput = "throughput (kb/s)"
