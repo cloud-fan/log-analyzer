@@ -1,6 +1,5 @@
 package cloud.fan
 
-import java.net.InetAddress
 import scala.sys.process._
 
 /**
@@ -8,7 +7,7 @@ import scala.sys.process._
  */
 object ShUtil {
   def generateCommand(command: Seq[String], node: String): ProcessBuilder = {
-    if (node == "localhost" || node == InetAddress.getLocalHost().getHostName()) {
+    if (node == Main.HOST_NAME) {
       command
     } else {
       Seq("ssh", node, command.map(handleSpecialParameter).mkString(" "))
@@ -16,7 +15,7 @@ object ShUtil {
   }
 
   def generatePipedCommand(command: Seq[Seq[String]], node: String): ProcessBuilder = {
-    if (node == "localhost" || node == InetAddress.getLocalHost().getHostName()) {
+    if (node == Main.HOST_NAME) {
       command.map(stringSeqToProcess).reduceLeft(_ #| _)
     } else {
       Seq("ssh", node, command.map(_.map(handleSpecialParameter).mkString(" ")).mkString("|"))

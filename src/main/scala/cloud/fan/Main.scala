@@ -9,6 +9,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.nio.file.attribute.BasicFileAttributes
 import java.io.IOException
+import java.net.InetAddress
 
 /**
  * Created by cloud on 3/21/14.
@@ -17,6 +18,8 @@ object Main {
 
   val futures = ListBuffer.empty[Future[Unit]]
   implicit val threadPool = ExecutionContext.fromExecutorService(Executors.newFixedThreadPool(64))
+
+  val HOST_NAME = InetAddress.getLocalHost().getHostName()
 
   def doWork(nodes: Array[String], groups: Array[String], nodeType: String, logDir: String) {
     ChartSender.sendNodes(nodeType, nodes)
@@ -53,8 +56,11 @@ object Main {
     val webPath = Paths.get(args(1), dirName).toAbsolutePath.toString
     val logDir = Paths.get("/tmp", dirName).toAbsolutePath.toString
     Files.createDirectory(Paths.get(logDir))
-    val serverNames = args(2).split(",")
-    val serverGroups = args(3).split(",")
+
+    def convertLocalhost(node: String) = if (node == "localhost") HOST_NAME else node
+
+    val serverNames = args(2).split(",").map(convertLocalhost)
+    val serverGroups = args(3).split(",").map(convertLocalhost)
     cleanRemoteProcesses(serverNames, serverGroups)
     doWork(serverNames, serverGroups, "server", logDir)
 
