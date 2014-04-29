@@ -78,8 +78,6 @@ object Main {
       } catch {
         case _: java.nio.file.NoSuchFileException => deleteDir(Paths.get(logDir))
       }
-      System.out.close()
-      System.err.close()
 
       def deleteDir(dir: Path) {
         Files.walkFileTree(dir, new SimpleFileVisitor[Path] {

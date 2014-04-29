@@ -31,7 +31,7 @@ object ChartSender {
   }
 
   def finish(resultPath: String) {
-    Http(s"$baseURL/finish").param("path", resultPath).asString
+    Http(s"$baseURL/finish").param("path", resultPath).option(HttpOptions.readTimeout(100000)).asString
   }
 
   def parseNodeName(node: String) = node.split("@").last
