@@ -1,6 +1,7 @@
-package cloud.fan
+package cloud.fan.analyze
 
 import scala.collection.mutable.ArrayBuffer
+import cloud.fan.ChartSender
 
 /**
  * Created by cloud on 3/24/14.

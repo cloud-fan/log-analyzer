@@ -1,4 +1,4 @@
-package cloud.fan
+package cloud.fan.analyze
 
 import scala.collection.mutable.ArrayBuffer
 

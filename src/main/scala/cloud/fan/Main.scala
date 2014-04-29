@@ -10,6 +10,7 @@ import java.util.Date
 import java.nio.file.attribute.BasicFileAttributes
 import java.io.IOException
 import java.net.InetAddress
+import cloud.fan.analyze._
 
 /**
  * Created by cloud on 3/21/14.
@@ -17,9 +18,9 @@ import java.net.InetAddress
 object Main {
 
   val futures = ListBuffer.empty[Future[Unit]]
-  implicit val threadPool = ExecutionContext.fromExecutorService(Executors.newFixedThreadPool(64))
+  implicit val threadPool = ExecutionContext.fromExecutorService(Executors.newCachedThreadPool())
 
-  val HOST_NAME = InetAddress.getLocalHost().getHostName()
+  val HOST_NAME = InetAddress.getLocalHost.getHostName
 
   def doWork(nodes: Array[String], groups: Array[String], nodeType: String, logDir: String) {
     ChartSender.sendNodes(nodeType, nodes)
@@ -35,17 +36,14 @@ object Main {
 
   def cleanRemoteProcesses(nodes: Array[String], groups: Array[String]) {
     def kill(node: String, process: String) {
-      val command = Seq(Seq("ps", "aux"), Seq("grep", process), Seq("grep", "-v", "grep"), Seq("grep", "-v", "log-analyzer"), Seq("awk", "{print $2}"))
-      val pid = ShUtil.generatePipedCommand(command, node).!!
-      if (pid.length > 0) {
-        ShUtil.generateCommand(Seq("kill", "-9") ++ pid.split("\n"), node).!
-      }
+      ProcessFinder.getProcessIds(process, node).map(pid => ShUtil.generateCommand(Seq("kill", "-9") ++ pid, node).!)
     }
     groups.foreach {
       case analyzeIFStatLog.group => nodes.foreach(kill(_, "ifstat"))
       case analyzeIOStatLog.group => nodes.foreach(kill(_, "iostat"))
       case analyzeMPStatLog.group => nodes.foreach(kill(_, "mpstat"))
       case analyzeVMStatLog.group => nodes.foreach(kill(_, "vmstat"))
+      case analyzeGCLog.pattern(_) => nodes.foreach(kill(_, "jstat"))
       case analyzeTopLog.pattern(_) => nodes.foreach(kill(_, "top"))
     }
   }

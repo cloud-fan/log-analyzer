@@ -1,4 +1,6 @@
-package cloud.fan
+package cloud.fan.analyze
+
+import cloud.fan.ChartSender
 
 /**
  * Created by cloud on 3/24/14.
@@ -14,7 +16,7 @@ object analyzeVMStatLog extends LogAnalyzer {
     analyzeLog.initCharts(nodeType, node, group, charts.toArray)
     logIterator.next()
     logIterator.next()
-    logIterator.foreach{line =>
+    logIterator foreach { line =>
       val data = line.trim().split("\\s+")
       ChartSender.sendData(nodeType, node, group, charts.head.name, Array(data(2), data(3), data(4), data(5)))
     }

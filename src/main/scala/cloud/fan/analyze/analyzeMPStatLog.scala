@@ -1,6 +1,7 @@
-package cloud.fan
+package cloud.fan.analyze
 
 import scala.collection.mutable.ArrayBuffer
+import cloud.fan.{ChartSender, ShUtil}
 
 /**
  * Created by cloud on 3/24/14.
@@ -30,7 +31,7 @@ object analyzeMPStatLog extends LogAnalyzer {
     i.next()
     i.next()
     i.next()
-    (0 until cpuCount).foreach{_ =>
+    (0 until cpuCount) foreach { _ =>
       val line = i.next().trim.split("\\s+")
       block += "%.2f".format(line(3).toDouble+line(5).toDouble)
     }

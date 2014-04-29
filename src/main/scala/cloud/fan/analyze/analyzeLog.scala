@@ -1,6 +1,7 @@
-package cloud.fan
+package cloud.fan.analyze
 
-import java.nio.file.{Paths, Files}
+import cloud.fan._
+import java.nio.file.{Files, Paths}
 import java.nio.charset.Charset
 
 /**
@@ -15,13 +16,14 @@ object analyzeLog {
       case analyzeMPStatLog.group => analyzeMPStatLog(nodeType, node, logDir)
       case analyzeVMStatLog.group => analyzeVMStatLog(nodeType, node, logDir)
       case analyzeTopLog.pattern(process) => analyzeTopLog(nodeType, node, logDir, process)
+      case analyzeGCLog.pattern(process) => analyzeGCLog(nodeType, node, logDir, process)
     }
   }
 
   def getLogContentIterator(command: Seq[String], node: String, logDir: String) = {
     val path = Paths.get(logDir, s"${ChartSender.parseNodeName(node)}-${command.head}.log")
     val writer = Files.newBufferedWriter(path, Charset.forName("utf-8"))
-    ShUtil.generateCommand(command, node).lines.iterator.map {s =>
+    ShUtil.generateCommand(command, node).lines.iterator map { s =>
       writer.write(s)
       writer.newLine()
       writer.flush()
@@ -31,7 +33,7 @@ object analyzeLog {
 
   def initCharts(nodeType: String, node: String, group: String, charts: Array[Chart]) {
     ChartSender.sendCharts(nodeType, node, group, charts.map(_.name))
-    charts.foreach{chart =>
+    charts foreach { chart =>
       ChartSender.sendChart(nodeType, node, group, chart.name, chart.series, chart.title, chart.yAxisTitle)
     }
   }
