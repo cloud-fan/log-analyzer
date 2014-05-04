@@ -1,7 +1,7 @@
 package cloud.fan.analyze
 
 import scala.collection.mutable.ArrayBuffer
-import cloud.fan.{ChartSender, ShUtil}
+import cloud.fan.{Main, ChartSender, ShUtil}
 
 /**
  * Created by cloud on 3/24/14.
@@ -10,7 +10,7 @@ object analyzeMPStatLog extends LogAnalyzer {
 
   val group: String = "CPU"
   charts += Chart("allCPU", "CPU usage across cores", percentage)
-  val command = Seq("mpstat", "-P", "ALL", "10")
+  val command = Seq("mpstat", "-P", "ALL", Main.interval.toString)
 
   def apply(nodeType: String, node: String, logDir: String) {
     val cpuCount = ShUtil.generatePipedCommand(Seq(Seq("grep", "processor", "/proc/cpuinfo"), Seq("wc", "-l")), node).!!.trim.toInt

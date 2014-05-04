@@ -1,7 +1,7 @@
 package cloud.fan.analyze
 
 import scala.collection.mutable.ArrayBuffer
-import cloud.fan.ChartSender
+import cloud.fan.{Main, ChartSender}
 
 /**
  * Created by cloud on 3/24/14.
@@ -12,7 +12,7 @@ object analyzeIOStatLog extends LogAnalyzer {
   charts += Chart("flashUtilization", "Flash Utilization", percentage)
   charts += Chart("writeBandwidth", "Flash Write Bandwidth", throughput)
   charts += Chart("readBandwidth", "Flash Read Bandwidth", throughput)
-  val command = Seq("iostat", "-xk", "10")
+  val command = Seq("iostat", "-xk", Main.interval.toString)
 
   def apply(nodeType: String, node: String, logDir: String) {
     val logIterator = analyzeLog.getLogContentIterator(command, node, logDir)

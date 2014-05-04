@@ -19,6 +19,7 @@ object Main {
 
   val futures = ListBuffer.empty[Future[Unit]]
   implicit val threadPool = ExecutionContext.fromExecutorService(Executors.newCachedThreadPool())
+  @volatile var interval = 0
 
   val HOST_NAME = InetAddress.getLocalHost.getHostName
 
@@ -49,22 +50,23 @@ object Main {
   }
 
   def main(args: Array[String]) {
-    val tag = args(0)
+    interval = args(0).toInt
+    val tag = args(1)
     val dirName = s"$tag-${new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date)}"
-    val webPath = Paths.get(args(1), dirName).toAbsolutePath.toString
+    val webPath = Paths.get(args(2), dirName).toAbsolutePath.toString
     val logDir = Paths.get("/tmp", dirName).toAbsolutePath.toString
     Files.createDirectory(Paths.get(logDir))
 
     def convertLocalhost(node: String) = if (node == "localhost") HOST_NAME else node
 
-    val serverNames = args(2).split(",").map(convertLocalhost)
-    val serverGroups = args(3).split(",").map(convertLocalhost)
+    val serverNames = args(3).split(",").map(convertLocalhost)
+    val serverGroups = args(4).split(",").map(convertLocalhost)
     cleanRemoteProcesses(serverNames, serverGroups)
     doWork(serverNames, serverGroups, "server", logDir)
 
-    if (args.length == 6) {
-      val clientNames = args(4).split(",")
-      val clientGroups = args(5).split(",")
+    if (args.length == 7) {
+      val clientNames = args(5).split(",")
+      val clientGroups = args(6).split(",")
       cleanRemoteProcesses(clientNames, clientGroups)
       doWork(clientNames, clientGroups, "client", logDir)
     }

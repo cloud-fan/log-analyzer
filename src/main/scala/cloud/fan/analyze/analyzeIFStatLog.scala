@@ -1,6 +1,6 @@
 package cloud.fan.analyze
 
-import cloud.fan.ChartSender
+import cloud.fan.{Main, ChartSender}
 
 /**
  * Created by cloud on 3/24/14.
@@ -9,7 +9,7 @@ object analyzeIFStatLog extends LogAnalyzer {
 
   val group = "network"
   charts += Chart("network", "Network Bandwidth", throughput)
-  val command = Seq("ifstat", "-n", "-T", "10")
+  val command = Seq("ifstat", "-n", "-T", Main.interval.toString)
 
   def apply(nodeType: String, node: String, logDir: String) {
     val logIterator = analyzeLog.getLogContentIterator(command, node, logDir)

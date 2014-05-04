@@ -1,6 +1,6 @@
 package cloud.fan.analyze
 
-import cloud.fan.ChartSender
+import cloud.fan.{Main, ChartSender}
 
 /**
  * Created by cloud on 3/24/14.
@@ -9,7 +9,7 @@ object analyzeVMStatLog extends LogAnalyzer {
 
   val group: String = "memory"
   charts += new Chart("DRAMallocation", "system DRAM allocation", "size (mb)", Array("swaped", "free", "buff", "cache"))
-  val command = Seq("vmstat", "-n", "10", "-S", "M")
+  val command = Seq("vmstat", "-n", Main.interval.toString, "-S", "M")
 
   def apply(nodeType: String, node: String, logDir: String) {
     val logIterator = analyzeLog.getLogContentIterator(command, node, logDir)

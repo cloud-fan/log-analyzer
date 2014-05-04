@@ -1,6 +1,6 @@
 package cloud.fan.analyze
 
-import cloud.fan.{ProcessFinder, ChartSender}
+import cloud.fan.{Main, ProcessFinder, ChartSender}
 
 /**
  * Created by cloud on 3/26/14.
@@ -8,7 +8,7 @@ import cloud.fan.{ProcessFinder, ChartSender}
 object analyzeTopLog extends LogAnalyzer {
 
   val group: String = "top"
-  val command = Seq("top", "-b", "-d", "10", "-p")
+  val command = Seq("top", "-b", "-d", Main.interval.toString, "-p")
 
   def apply(nodeType: String, node: String, logDir: String, process: String) {
     ProcessFinder.getUniqueProcessId(process, node) map { pid =>
