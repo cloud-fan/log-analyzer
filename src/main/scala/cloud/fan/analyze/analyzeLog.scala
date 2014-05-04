@@ -20,8 +20,8 @@ object analyzeLog {
     }
   }
 
-  def getLogContentIterator(command: Seq[String], node: String, logDir: String) = {
-    val path = Paths.get(logDir, s"${ChartSender.parseNodeName(node)}-${command.head}.log")
+  def getLogContentIterator(command: Seq[String], node: String, logDir: String, logFileName: String = null) = {
+    val path = Paths.get(logDir, s"${ChartSender.parseNodeName(node)}-${if (logFileName == null) command.head else logFileName}.log")
     val writer = Files.newBufferedWriter(path, Charset.forName("utf-8"))
     ShUtil.generateCommand(command, node).lines.iterator map { s =>
       writer.write(s)

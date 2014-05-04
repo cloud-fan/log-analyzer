@@ -1,6 +1,6 @@
 package cloud.fan.analyze
 
-import cloud.fan.{ProcessFinder, ChartSender, ShUtil}
+import cloud.fan.{ProcessFinder, ChartSender}
 
 /**
  * Created by cloud on 3/26/14.

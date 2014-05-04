@@ -15,7 +15,7 @@ object analyzeGCLog extends LogAnalyzer {
   def apply(nodeType: String, node: String, logDir: String, process: String) {
     ProcessFinder.getUniqueProcessId(process, node) map { pid =>
       analyzeLog.initCharts(nodeType, node, group, charts.toArray)
-      val logIterator = analyzeLog.getLogContentIterator(command :+ pid :+ "10000", node, logDir)
+      val logIterator = analyzeLog.getLogContentIterator(command :+ pid :+ "10000", node, logDir, "gc")
       logIterator.next()
       logIterator foreach { line =>
         val data = line.trim().split("\\s+").last
