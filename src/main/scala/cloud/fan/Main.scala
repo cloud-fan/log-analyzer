@@ -26,26 +26,13 @@ object Main {
   def doWork(nodes: Array[String], groups: Array[String], nodeType: String, logDir: String) {
     ChartSender.sendNodes(nodeType, nodes)
     for(node <- nodes) {
-      ChartSender.sendGroups(nodeType, node, groups.map("(^[a-zA-Z]+).*".r.findFirstMatchIn(_).get.group(1)))
+      // not support analyze FDF yet
+      ChartSender.sendGroups(nodeType, node, groups.map("(^[a-zA-Z]+).*".r.findFirstMatchIn(_).get.group(1)).filterNot(_.contains("FDF")))
       for (group <- groups) {
         futures += future {
           analyzeLog(nodeType, node, logDir, group)
         }
       }
-    }
-  }
-
-  def cleanRemoteProcesses(nodes: Array[String], groups: Array[String]) {
-    def kill(node: String, process: String) {
-      ProcessFinder.getProcessIds(process, node).map(pid => ShUtil.generateCommand(Seq("kill", "-9") ++ pid, node).!)
-    }
-    groups.foreach {
-      case analyzeIFStatLog.group => nodes.foreach(kill(_, "ifstat"))
-      case analyzeIOStatLog.group => nodes.foreach(kill(_, "iostat"))
-      case analyzeMPStatLog.group => nodes.foreach(kill(_, "mpstat"))
-      case analyzeVMStatLog.group => nodes.foreach(kill(_, "vmstat"))
-      case analyzeGCLog.pattern(_) => nodes.foreach(kill(_, "jstat"))
-      case analyzeTopLog.pattern(_) => nodes.foreach(kill(_, "top"))
     }
   }
 
@@ -61,13 +48,11 @@ object Main {
 
     val serverNames = args(3).split(",").map(convertLocalhost)
     val serverGroups = args(4).split(",").map(convertLocalhost)
-    cleanRemoteProcesses(serverNames, serverGroups)
     doWork(serverNames, serverGroups, "server", logDir)
 
     if (args.length == 7) {
       val clientNames = args(5).split(",")
       val clientGroups = args(6).split(",")
-      cleanRemoteProcesses(clientNames, clientGroups)
       doWork(clientNames, clientGroups, "client", logDir)
     }
 

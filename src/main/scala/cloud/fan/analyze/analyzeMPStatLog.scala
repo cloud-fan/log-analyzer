@@ -26,7 +26,7 @@ object analyzeMPStatLog extends LogAnalyzer {
     }
   }
 
-  def getBlock(i: Iterator[String], block: ArrayBuffer[String], cpuCount: Int) {
+  private def getBlock(i: Iterator[String], block: ArrayBuffer[String], cpuCount: Int) {
     block.clear()
     i.next()
     i.next()

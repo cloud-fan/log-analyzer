@@ -21,7 +21,7 @@ object ProcessFinder {
 
   def getUniqueProcessId(processName: String, node: String): Option[String] = {
 
-    def doWork(reTryCount: Int = 40): Option[String] = {
+    def doWork(reTryCount: Int = 50): Option[String] = {
       getProcessIds(processName, node) match {
         case Some(pid) =>
           if (pid.size == 1) {
@@ -44,7 +44,7 @@ object ProcessFinder {
     if (cachedProcessId.contains(processName)) {
       cachedProcessId(processName)
     } else {
-      cachedProcessId.synchronized {
+      processName.synchronized {
         if (cachedProcessId.contains(processName)) {
           cachedProcessId(processName)
         } else {

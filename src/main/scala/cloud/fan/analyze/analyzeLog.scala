@@ -15,12 +15,18 @@ object analyzeLog {
       case analyzeIOStatLog.group => analyzeIOStatLog(nodeType, node, logDir)
       case analyzeMPStatLog.group => analyzeMPStatLog(nodeType, node, logDir)
       case analyzeVMStatLog.group => analyzeVMStatLog(nodeType, node, logDir)
-      case analyzeTopLog.pattern(process) => analyzeTopLog(nodeType, node, logDir, process)
-      case analyzeGCLog.pattern(process) => analyzeGCLog(nodeType, node, logDir, process)
+      case analyzeTopLog.pattern(process) => analyzeTopLog(nodeType, node, logDir, process.intern())
+      case analyzeGCLog.pattern(process) => analyzeGCLog(nodeType, node, logDir, process.intern())
+      case analyzeFDFStatLog.pattern(process) => analyzeFDFStatLog(nodeType, node, logDir, process.intern())
     }
   }
 
+  private def cleanRemoteProcesses(node: String, process: String) {
+    ProcessFinder.getProcessIds(process, node).map(pid => ShUtil.generateCommand(Seq("kill", "-9") ++ pid, node).!)
+  }
+
   def getLogContentIterator(command: Seq[String], node: String, logDir: String, logFileName: String = null) = {
+    cleanRemoteProcesses(node, command.head)
     val path = Paths.get(logDir, s"${ChartSender.parseNodeName(node)}-${if (logFileName == null) command.head else logFileName}.log")
     val writer = Files.newBufferedWriter(path, Charset.forName("utf-8"))
     ShUtil.generateCommand(command, node).lines.iterator map { s =>

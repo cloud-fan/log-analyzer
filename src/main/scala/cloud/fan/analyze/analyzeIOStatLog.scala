@@ -28,7 +28,7 @@ object analyzeIOStatLog extends LogAnalyzer {
     }
   }
 
-  def getBlock(i: Iterator[String], block: ArrayBuffer[Array[String]]) {
+  private def getBlock(i: Iterator[String], block: ArrayBuffer[Array[String]]) {
     block.clear()
     i.find(_.startsWith("Device:"))
     var line = i.next()
@@ -41,7 +41,7 @@ object analyzeIOStatLog extends LogAnalyzer {
     }
   }
 
-  def checkValidDevice(name: String) = {
+  private def checkValidDevice(name: String) = {
     name.matches("s[a-z]{2}") || name.startsWith("md")
   }
 }
