@@ -9,7 +9,8 @@ import cloud.fan.{Main, ChartSender, ProcessFinder}
 object analyzeGCLog extends LogAnalyzer {
 
   val group: String = "GC"
-  charts += new Chart("totalGCTime", "Total GC Time", "time (s)", Array("GC"))
+  charts += new Chart("minorGCTime", "Total Minor GC Time", "time (s)", Array("time"))
+  charts += new Chart("fullGCTime", "Total Full GC Time", "time (s)", Array("time"))
   val command: Seq[String] = Seq("jstat", "-gcutil")
 
   def apply(nodeType: String, node: String, logDir: String, process: String) {
@@ -18,8 +19,9 @@ object analyzeGCLog extends LogAnalyzer {
       val logIterator = analyzeLog.getLogContentIterator(command :+ pid :+ (Main.interval * 1000).toString, node, logDir, "gc")
       logIterator.next()
       logIterator foreach { line =>
-        val data = line.trim().split("\\s+").last
-        ChartSender.sendData(nodeType, node, group, charts.head.name, Array(data))
+        val data = line.trim().split("\\s+")
+        ChartSender.sendData(nodeType, node, group, charts(0).name, Array(data(6)))
+        ChartSender.sendData(nodeType, node, group, charts(1).name, Array(data(8)))
       }
     }
   }
